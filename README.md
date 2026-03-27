@@ -87,8 +87,8 @@ Notes:
 
 ## Tested host assumptions
 
-- Tested locally with OpenClaw `2026.3.26`
-- Requires OpenClaw host version `>=2026.3.26` for this published V1 package
+- Tested locally with OpenClaw `2026.3.24`
+- Requires OpenClaw host version `>=2026.3.24` for this published V1 package
 - Earlier OpenClaw versions are unverified
 
 ## Packaging notes

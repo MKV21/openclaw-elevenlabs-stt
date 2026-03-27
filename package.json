@@ -37,7 +37,7 @@
       "./index.ts"
     ],
     "install": {
-      "minHostVersion": ">=2026.3.26"
+      "minHostVersion": ">=2026.3.24"
     },
     "release": {
       "publishToNpm": true
@@ -48,7 +48,7 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.3.26"
+    "openclaw": ">=2026.3.24"
   },
   "peerDependenciesMeta": {
     "openclaw": {
