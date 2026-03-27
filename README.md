@@ -1,54 +1,50 @@
-# openclaw-elevenlabs-stt
+# elevenlabs-stt
 
-Experimental companion project for adding ElevenLabs Speech-to-Text support to OpenClaw's inbound audio pipeline.
+OpenClaw plugin that adds ElevenLabs Speech-to-Text to the normal inbound audio pipeline (`tools.media.audio`).
 
-## Goal
+It is intended for voice notes and audio attachments such as Telegram voice messages or Discord audio uploads, using ElevenLabs' file-based STT endpoint.
 
-Use ElevenLabs STT for normal inbound voice/audio messages (e.g. Telegram voice notes, Discord voice attachments) via OpenClaw's `tools.media.audio` path, while keeping the implementation maintainable across OpenClaw updates.
-
-## Current intent
-
-- Build as much as possible as a plugin/extension
-- Minimize required OpenClaw core changes
-- Upstream the necessary core hook/capability work to OpenClaw
-- Keep this repo publishable later
-
-## Status
-
-Small V1 plugin implemented in this repo.
-
-Current scope:
+## What this plugin does
 
 - registers an OpenClaw media-understanding provider with provider ID `elevenlabs`
-- targets normal inbound audio transcription via `tools.media.audio`
-- uses ElevenLabs batch/file STT (`POST /v1/speech-to-text`)
-- supports `file`, `model_id`, and optional `language_code`
-- throws on upstream errors or missing transcript text so OpenClaw fallback order can continue
-- keeps the small HTTP/baseUrl/error helper logic local instead of importing `openclaw/plugin-sdk/provider-http`
+- transcribes normal inbound audio files through `POST /v1/speech-to-text`
+- supports `model_id` and optional `language_code`
+- lets OpenClaw handle fallback order through `tools.media.audio.models`
+- propagates upstream failures so the next configured fallback entry can run
 
-Out of scope in this V1:
+## V1 scope
+
+Included in V1:
+
+- normal inbound audio transcription only
+- plugin ID `elevenlabs-stt`
+- npm package name `elevenlabs-stt`
+- media-understanding provider ID `elevenlabs`
+- explicit config through `plugins.entries`, `models.providers`, and `tools.media.audio.models`
+
+Not included in V1:
 
 - `voice-call` / telephony integration
-- realtime / streaming STT
+- realtime or streaming STT
 - timestamps
 - diarization
 - advanced ElevenLabs request options
 
-## Plugin identity
+## Install
 
-- Package name: `elevenlabs-stt`
-- Plugin ID: `elevenlabs-stt`
-- Media-understanding provider ID: `elevenlabs`
+Install from npm:
 
-## Local install
+```bash
+openclaw plugins install elevenlabs-stt
+```
 
-From an OpenClaw host checkout:
+Install a local checkout during development:
 
 ```bash
 openclaw plugins install --link /path/to/openclaw-elevenlabs-stt
 ```
 
-Recommended activation:
+OpenClaw may persist plugin install metadata automatically, but the explicit activation shape for docs and config reviews remains:
 
 ```yaml
 plugins:
@@ -57,7 +53,7 @@ plugins:
       enabled: true
 ```
 
-## Recommended V1 config
+## Recommended configuration
 
 ```yaml
 plugins:
@@ -77,7 +73,7 @@ tools:
     audio:
       enabled: true
       timeoutSeconds: 90
-      language: de
+      language: en
       models:
         - provider: elevenlabs
           model: scribe_v2
@@ -98,39 +94,48 @@ tools:
 Notes:
 
 - `models.providers.elevenlabs.models: []` is currently required by OpenClaw's shared provider config shape.
-- fallback should be expressed by entry order in `tools.media.audio.models`.
-- the plugin itself does not implement internal fallback logic.
+- Fallback order is defined by the order of entries in `tools.media.audio.models`.
+- The plugin does not implement its own internal fallback logic.
 
-## Development
+## Tested host assumptions
 
-This repo expects a sibling OpenClaw checkout during development:
+- Tested locally with OpenClaw `2026.3.26`
+- Requires OpenClaw host version `>=2026.3.26` for this published V1 package
+- Earlier OpenClaw versions are unverified
+
+## Packaging notes
+
+This package is intentionally published as TypeScript source. OpenClaw loads plugin entrypoints from `openclaw.extensions` with its TypeScript-capable plugin loader, so a separate `dist/` build step is not required for this V1 package.
+
+## Local development
+
+This repository expects a sibling OpenClaw checkout during development:
 
 ```text
 ../openclaw
 ../openclaw-elevenlabs-stt
 ```
 
-The current development setup is intentionally split:
+Development setup:
 
-- **Tests** resolve `openclaw/*` imports against `../openclaw/src` via `vitest.config.ts`
-- **Typecheck** currently uses a small local SDK shim in `openclaw-shim.d.ts`
+- tests resolve `openclaw/*` imports against `../openclaw/src` through `vitest.config.ts`
+- `npm run typecheck` uses the local shim in `openclaw-shim.d.ts`
+- host/plugin load testing remains the most important integration check
 
-This means `npm run typecheck` is useful for local safety, but it is **not** a full compatibility guarantee against the real OpenClaw SDK surface. A real host/plugin load test remains the most important integration check.
-
-Install dependencies:
+Commands:
 
 ```bash
 npm install
-```
-
-Run tests:
-
-```bash
 npm test
-```
-
-Run typecheck:
-
-```bash
 npm run typecheck
 ```
+
+## AI-assisted development disclaimer
+
+Parts of this project were developed with assistance from generative AI tools.
+All generated code and text were reviewed and adapted by a human before publication.
+
+## License
+
+This project is licensed under the **MIT License**.
+See [LICENSE](./LICENSE) for details.

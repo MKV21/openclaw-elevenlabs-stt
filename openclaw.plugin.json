@@ -1,5 +1,7 @@
 {
   "id": "elevenlabs-stt",
+  "name": "ElevenLabs STT",
+  "description": "ElevenLabs batch speech-to-text provider for OpenClaw media understanding",
   "providerAuthEnvVars": {
     "elevenlabs": ["ELEVENLABS_API_KEY"]
   },

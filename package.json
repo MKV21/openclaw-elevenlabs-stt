@@ -1,21 +1,58 @@
 {
   "name": "elevenlabs-stt",
   "version": "0.1.0",
-  "private": true,
-  "description": "OpenClaw plugin for ElevenLabs inbound audio transcription",
+  "description": "OpenClaw plugin for ElevenLabs speech-to-text on inbound audio",
   "license": "MIT",
   "type": "module",
+  "homepage": "https://github.com/MKV21/openclaw-elevenlabs-stt#readme",
+  "bugs": {
+    "url": "https://github.com/MKV21/openclaw-elevenlabs-stt/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MKV21/openclaw-elevenlabs-stt.git"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "elevenlabs",
+    "stt",
+    "speech-to-text",
+    "audio-transcription"
+  ],
+  "files": [
+    "index.ts",
+    "media-understanding-provider.ts",
+    "provider-http-lite.ts",
+    "openclaw.plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.14.0"
+  },
   "openclaw": {
     "extensions": [
-      "index.ts"
-    ]
+      "./index.ts"
+    ],
+    "install": {
+      "minHostVersion": ">=2026.3.26"
+    },
+    "release": {
+      "publishToNpm": true
+    }
   },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "openclaw": "*"
+    "openclaw": ">=2026.3.26"
+  },
+  "peerDependenciesMeta": {
+    "openclaw": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^24.6.0",
