@@ -1,4 +1,5 @@
 node_modules/
 coverage/
+*.tgz
 IMPLEMENTATION_PLAN.md
 notes/

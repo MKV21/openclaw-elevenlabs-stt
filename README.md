@@ -18,7 +18,7 @@ Included in V1:
 
 - normal inbound audio transcription only
 - plugin ID `elevenlabs-stt`
-- npm package name `elevenlabs-stt`
+- npm package name `@mkv21/elevenlabs-stt`
 - media-understanding provider ID `elevenlabs`
 - explicit config through `plugins.entries`, `models.providers`, and `tools.media.audio.models`
 
@@ -35,7 +35,7 @@ Not included in V1:
 Install from npm:
 
 ```bash
-openclaw plugins install elevenlabs-stt
+openclaw plugins install @mkv21/elevenlabs-stt
 ```
 
 Install a local checkout during development:
@@ -52,6 +52,11 @@ plugins:
     elevenlabs-stt:
       enabled: true
 ```
+
+Notes:
+
+- The published package name is `@mkv21/elevenlabs-stt`, but the plugin ID remains `elevenlabs-stt`.
+- Use the scoped package for OpenClaw installs. On current OpenClaw versions, the unscoped name `elevenlabs-stt` collides with an existing ClawHub skill name during resolver lookup.
 
 ## Recommended configuration
 
