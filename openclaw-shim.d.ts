@@ -49,23 +49,3 @@ declare module "openclaw/plugin-sdk/plugin-entry" {
     register(api: OpenClawPluginApi): void;
   };
 }
-
-declare module "openclaw/plugin-sdk/provider-http" {
-  export function normalizeBaseUrl(baseUrl: string | undefined, fallback: string): string;
-  export function assertOkOrThrowHttpError(res: Response, label: string): Promise<void>;
-  export function requireTranscriptionText(
-    value: string | undefined,
-    missingMessage: string,
-  ): string;
-  export function postTranscriptionRequest(params: {
-    url: string;
-    headers: Headers;
-    body: BodyInit;
-    timeoutMs: number;
-    fetchFn: typeof fetch;
-    allowPrivateNetwork?: boolean;
-  }): Promise<{
-    response: Response;
-    release: () => Promise<void>;
-  }>;
-}

@@ -24,6 +24,7 @@ Current scope:
 - uses ElevenLabs batch/file STT (`POST /v1/speech-to-text`)
 - supports `file`, `model_id`, and optional `language_code`
 - throws on upstream errors or missing transcript text so OpenClaw fallback order can continue
+- keeps the small HTTP/baseUrl/error helper logic local instead of importing `openclaw/plugin-sdk/provider-http`
 
 Out of scope in this V1:
 
@@ -35,6 +36,7 @@ Out of scope in this V1:
 
 ## Plugin identity
 
+- Package name: `elevenlabs-stt`
 - Plugin ID: `elevenlabs-stt`
 - Media-understanding provider ID: `elevenlabs`
 

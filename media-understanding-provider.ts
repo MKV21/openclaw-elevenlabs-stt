@@ -9,7 +9,7 @@ import {
   normalizeBaseUrl,
   postTranscriptionRequest,
   requireTranscriptionText,
-} from "openclaw/plugin-sdk/provider-http";
+} from "./provider-http-lite.js";
 
 export const ELEVENLABS_DEFAULT_AUDIO_BASE_URL = "https://api.elevenlabs.io/v1";
 export const ELEVENLABS_DEFAULT_AUDIO_TRANSCRIPTION_MODEL = "scribe_v2";
@@ -43,7 +43,6 @@ export async function transcribeElevenLabsAudio(
 ): Promise<AudioTranscriptionResult> {
   const fetchFn = params.fetchFn ?? fetch;
   const baseUrl = normalizeBaseUrl(params.baseUrl, ELEVENLABS_DEFAULT_AUDIO_BASE_URL);
-  const allowPrivateNetwork = Boolean(params.baseUrl?.trim());
   const url = `${baseUrl}/speech-to-text`;
   const model = resolveModel(params.model, ELEVENLABS_DEFAULT_AUDIO_TRANSCRIPTION_MODEL);
 
@@ -59,28 +58,23 @@ export async function transcribeElevenLabsAudio(
     headers.set("xi-api-key", params.apiKey);
   }
 
-  const { response: res, release } = await postTranscriptionRequest({
+  const res = await postTranscriptionRequest({
     url,
     headers,
     body: form,
     timeoutMs: params.timeoutMs,
     fetchFn,
-    allowPrivateNetwork,
   });
 
-  try {
-    await assertOkOrThrowHttpError(res, "ElevenLabs audio transcription failed");
+  await assertOkOrThrowHttpError(res, "ElevenLabs audio transcription failed");
 
-    const payload = (await res.json()) as ElevenLabsTranscriptionResponse;
-    const text = requireTranscriptionText(
-      payload.text,
-      "ElevenLabs audio transcription response missing text",
-    );
+  const payload = (await res.json()) as ElevenLabsTranscriptionResponse;
+  const text = requireTranscriptionText(
+    payload.text,
+    "ElevenLabs audio transcription response missing text",
+  );
 
-    return { text, model };
-  } finally {
-    await release();
-  }
+  return { text, model };
 }
 
 export const elevenlabsMediaUnderstandingProvider: MediaUnderstandingProvider = {

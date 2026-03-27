@@ -1,5 +1,5 @@
 {
-  "name": "openclaw-elevenlabs-stt",
+  "name": "elevenlabs-stt",
   "version": "0.1.0",
   "private": true,
   "description": "OpenClaw plugin for ElevenLabs inbound audio transcription",
