@@ -110,6 +110,60 @@ describe("transcribeElevenLabsAudio", () => {
     expect(form.get("language_code")).toBe("en");
   });
 
+  it("passes supported scalar ElevenLabs options from providerOptions", async () => {
+    const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
+      text: "Hello world",
+    });
+
+    await transcribeElevenLabsAudio({
+      buffer: Buffer.from("audio-bytes"),
+      fileName: "voice.wav",
+      apiKey: "test-key",
+      timeoutMs: 1234,
+      fetchFn,
+      query: {
+        tag_audio_events: true,
+        no_verbatim: false,
+        enable_logging: false,
+        diarize: true,
+        num_speakers: 2,
+        diarization_threshold: 0.22,
+        use_multi_channel: true,
+        timestamps_granularity: "word",
+        entity_detection: "pii",
+        redact: "pii",
+        entity_redaction: "entity_type",
+        temperature: 0,
+        seed: 42,
+        file_format: "other",
+        keyterms: "hello,world",
+        additional_formats: "srt",
+        ignored_option: true,
+      },
+    });
+
+    const { url, init } = getRequest();
+    expect(url).toBe("https://api.elevenlabs.io/v1/speech-to-text?enable_logging=false");
+
+    const form = init?.body as FormData;
+    expect(form.get("tag_audio_events")).toBe("true");
+    expect(form.get("no_verbatim")).toBe("false");
+    expect(form.get("diarize")).toBe("true");
+    expect(form.get("num_speakers")).toBe("2");
+    expect(form.get("diarization_threshold")).toBe("0.22");
+    expect(form.get("use_multi_channel")).toBe("true");
+    expect(form.get("timestamps_granularity")).toBe("word");
+    expect(form.get("entity_detection")).toBe("pii");
+    expect(form.get("redact")).toBe("pii");
+    expect(form.get("entity_redaction")).toBe("entity_type");
+    expect(form.get("temperature")).toBe("0");
+    expect(form.get("seed")).toBe("42");
+    expect(form.get("file_format")).toBe("other");
+    expect(form.get("keyterms")).toBeNull();
+    expect(form.get("additional_formats")).toBeNull();
+    expect(form.get("ignored_option")).toBeNull();
+  });
+
   it("uses the default model when the configured model is blank", async () => {
     const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
       text: "Hello world",
