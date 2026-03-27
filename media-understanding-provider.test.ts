@@ -54,7 +54,7 @@ describe("elevenlabs plugin entry", () => {
 describe("transcribeElevenLabsAudio", () => {
   it("builds the expected multipart request and returns transcript text", async () => {
     const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
-      text: "Hallo Welt",
+      text: "Hello world",
     });
 
     const result = await transcribeElevenLabsAudio({
@@ -69,7 +69,7 @@ describe("transcribeElevenLabsAudio", () => {
     });
 
     const { url, init } = getRequest();
-    expect(result).toEqual({ text: "Hallo Welt", model: "scribe_v2" });
+    expect(result).toEqual({ text: "Hello world", model: "scribe_v2" });
     expect(url).toBe("https://example.com/v1/speech-to-text");
     expect(init?.method).toBe("POST");
     expect(init?.signal).toBeInstanceOf(AbortSignal);
@@ -94,7 +94,7 @@ describe("transcribeElevenLabsAudio", () => {
 
   it("passes language_code when language is configured", async () => {
     const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
-      text: "Hallo Welt",
+      text: "Hello world",
     });
 
     await transcribeElevenLabsAudio({
@@ -102,17 +102,17 @@ describe("transcribeElevenLabsAudio", () => {
       fileName: "voice.wav",
       apiKey: "test-key",
       timeoutMs: 1234,
-      language: " de ",
+      language: " en ",
       fetchFn,
     });
 
     const form = getRequest().init?.body as FormData;
-    expect(form.get("language_code")).toBe("de");
+    expect(form.get("language_code")).toBe("en");
   });
 
   it("uses the default model when the configured model is blank", async () => {
     const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
-      text: "Hallo Welt",
+      text: "Hello world",
     });
 
     const result = await transcribeElevenLabsAudio({

@@ -77,24 +77,12 @@ tools:
       models:
         - provider: elevenlabs
           model: scribe_v2
-        - type: cli
-          command: whisper
-          args:
-            - --model
-            - turbo
-            - --output_format
-            - txt
-            - --output_dir
-            - "{{OutputDir}}"
-            - --verbose
-            - "False"
-            - "{{MediaPath}}"
 ```
 
 Notes:
 
 - `models.providers.elevenlabs.models: []` is currently required by OpenClaw's shared provider config shape.
-- Fallback order is defined by the order of entries in `tools.media.audio.models`.
+- If you want fallback behavior, add additional entries after the ElevenLabs model in `tools.media.audio.models`.
 - The plugin does not implement its own internal fallback logic.
 
 ## Tested host assumptions
@@ -106,29 +94,6 @@ Notes:
 ## Packaging notes
 
 This package is intentionally published as TypeScript source. OpenClaw loads plugin entrypoints from `openclaw.extensions` with its TypeScript-capable plugin loader, so a separate `dist/` build step is not required for this V1 package.
-
-## Local development
-
-This repository expects a sibling OpenClaw checkout during development:
-
-```text
-../openclaw
-../openclaw-elevenlabs-stt
-```
-
-Development setup:
-
-- tests resolve `openclaw/*` imports against `../openclaw/src` through `vitest.config.ts`
-- `npm run typecheck` uses the local shim in `openclaw-shim.d.ts`
-- host/plugin load testing remains the most important integration check
-
-Commands:
-
-```bash
-npm install
-npm test
-npm run typecheck
-```
 
 ## AI-assisted development disclaimer
 
