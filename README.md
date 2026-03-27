@@ -86,9 +86,64 @@ tools:
 
 Notes:
 
-- `models.providers.elevenlabs.models: []` is currently required by OpenClaw's shared provider config shape.
+- `models.providers.elevenlabs` must be a structurally valid OpenClaw custom provider entry.
+- `models.providers.elevenlabs.models: []` is currently required by OpenClaw's shared provider config shape, even though this plugin uses OpenClaw's media-understanding path instead of the normal text-model catalog.
+- If you prefer an explicit env-backed secret ref, use:
+
+  ```yaml
+  apiKey:
+    source: env
+    provider: default
+    id: ELEVENLABS_API_KEY
+  ```
+
+  `${ELEVENLABS_API_KEY}` also works if that matches your normal OpenClaw config style.
 - If you want fallback behavior, add additional entries after the ElevenLabs model in `tools.media.audio.models`.
 - The plugin does not implement its own internal fallback logic.
+
+## Troubleshooting
+
+### Gateway does not start after enabling the plugin
+
+This is usually caused by an incomplete `models.providers.elevenlabs` block.
+
+On current OpenClaw versions, `models.providers.<id>` is validated as a full custom provider entry. That means a partial config such as only `apiKey`, only `baseUrl`, or a missing `models: []` can make the Gateway reject the config during startup.
+
+Use the full minimal block from the example above:
+
+```yaml
+models:
+  providers:
+    elevenlabs:
+      baseUrl: https://api.elevenlabs.io/v1
+      apiKey:
+        source: env
+        provider: default
+        id: ELEVENLABS_API_KEY
+      models: []
+```
+
+### The plugin is installed, but transcription still does not run
+
+Check all of the following:
+
+- `plugins.entries.elevenlabs-stt.enabled: true`
+- `tools.media.audio.enabled: true`
+- `tools.media.audio.models` contains an ElevenLabs entry
+- `ELEVENLABS_API_KEY` is available to the Gateway process
+
+### I want the API key to stay out of the config file
+
+Use an env-backed secret ref for `models.providers.elevenlabs.apiKey`:
+
+```yaml
+apiKey:
+  source: env
+  provider: default
+  id: ELEVENLABS_API_KEY
+```
+
+That keeps the secret value outside the config file while still satisfying OpenClaw's current provider-config validation rules.
 
 ## Tested host assumptions
 
