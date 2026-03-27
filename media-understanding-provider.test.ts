@@ -1,0 +1,178 @@
+import { describe, expect, it, vi } from "vitest";
+import plugin from "./index.js";
+import {
+  ELEVENLABS_DEFAULT_AUDIO_TRANSCRIPTION_MODEL,
+  elevenlabsMediaUnderstandingProvider,
+  transcribeElevenLabsAudio,
+} from "./media-understanding-provider.js";
+
+function resolveRequestUrl(input: RequestInfo | URL): string {
+  if (typeof input === "string") {
+    return input;
+  }
+  if (input instanceof URL) {
+    return input.toString();
+  }
+  return input.url;
+}
+
+function createRequestCaptureJsonFetch(responseBody: unknown, status = 200) {
+  let seenUrl: string | null = null;
+  let seenInit: RequestInit | undefined;
+
+  const fetchFn: typeof fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    seenUrl = resolveRequestUrl(input);
+    seenInit = init;
+    return new Response(JSON.stringify(responseBody), {
+      status,
+      headers: { "content-type": "application/json" },
+    });
+  });
+
+  return {
+    fetchFn,
+    getRequest: () => ({ url: seenUrl, init: seenInit }),
+  };
+}
+
+describe("elevenlabs plugin entry", () => {
+  it("registers the media-understanding provider", () => {
+    const registerMediaUnderstandingProvider = vi.fn();
+
+    plugin.register({
+      registerMediaUnderstandingProvider,
+    } as unknown as Parameters<typeof plugin.register>[0]);
+
+    expect(plugin.id).toBe("elevenlabs-stt");
+    expect(registerMediaUnderstandingProvider).toHaveBeenCalledTimes(1);
+    expect(registerMediaUnderstandingProvider).toHaveBeenCalledWith(
+      elevenlabsMediaUnderstandingProvider,
+    );
+  });
+});
+
+describe("transcribeElevenLabsAudio", () => {
+  it("builds the expected multipart request and returns transcript text", async () => {
+    const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
+      text: "Hallo Welt",
+    });
+
+    const result = await transcribeElevenLabsAudio({
+      buffer: Buffer.from("audio-bytes"),
+      fileName: "voice.wav",
+      apiKey: "test-key",
+      timeoutMs: 1234,
+      baseUrl: "https://example.com/v1/",
+      model: " scribe_v2 ",
+      mime: "audio/wav",
+      fetchFn,
+    });
+
+    const { url, init } = getRequest();
+    expect(result).toEqual({ text: "Hallo Welt", model: "scribe_v2" });
+    expect(url).toBe("https://example.com/v1/speech-to-text");
+    expect(init?.method).toBe("POST");
+    expect(init?.signal).toBeInstanceOf(AbortSignal);
+
+    const headers = new Headers(init?.headers);
+    expect(headers.get("xi-api-key")).toBe("test-key");
+
+    const form = init?.body as FormData;
+    expect(form).toBeInstanceOf(FormData);
+    expect(form.get("model_id")).toBe("scribe_v2");
+    expect(form.get("language_code")).toBeNull();
+
+    const file = form.get("file") as Blob | { type?: string; name?: string } | null;
+    expect(file).not.toBeNull();
+    if (file) {
+      expect(file.type).toBe("audio/wav");
+      if ("name" in file && typeof file.name === "string") {
+        expect(file.name).toBe("voice.wav");
+      }
+    }
+  });
+
+  it("passes language_code when language is configured", async () => {
+    const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
+      text: "Hallo Welt",
+    });
+
+    await transcribeElevenLabsAudio({
+      buffer: Buffer.from("audio-bytes"),
+      fileName: "voice.wav",
+      apiKey: "test-key",
+      timeoutMs: 1234,
+      language: " de ",
+      fetchFn,
+    });
+
+    const form = getRequest().init?.body as FormData;
+    expect(form.get("language_code")).toBe("de");
+  });
+
+  it("uses the default model when the configured model is blank", async () => {
+    const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
+      text: "Hallo Welt",
+    });
+
+    const result = await transcribeElevenLabsAudio({
+      buffer: Buffer.from("audio-bytes"),
+      fileName: "voice.wav",
+      apiKey: "test-key",
+      timeoutMs: 1234,
+      model: " ",
+      fetchFn,
+    });
+
+    const form = getRequest().init?.body as FormData;
+    expect(form.get("model_id")).toBe(ELEVENLABS_DEFAULT_AUDIO_TRANSCRIPTION_MODEL);
+    expect(result.model).toBe(ELEVENLABS_DEFAULT_AUDIO_TRANSCRIPTION_MODEL);
+  });
+
+  it("throws on non-2xx upstream responses", async () => {
+    const { fetchFn } = createRequestCaptureJsonFetch(
+      {
+        detail: "rate limited",
+      },
+      429,
+    );
+
+    await expect(
+      transcribeElevenLabsAudio({
+        buffer: Buffer.from("audio-bytes"),
+        fileName: "voice.wav",
+        apiKey: "test-key",
+        timeoutMs: 1234,
+        fetchFn,
+      }),
+    ).rejects.toThrow("ElevenLabs audio transcription failed (HTTP 429)");
+  });
+
+  it("throws when the provider response omits text", async () => {
+    const { fetchFn } = createRequestCaptureJsonFetch({});
+
+    await expect(
+      transcribeElevenLabsAudio({
+        buffer: Buffer.from("audio-bytes"),
+        fileName: "voice.wav",
+        apiKey: "test-key",
+        timeoutMs: 1234,
+        fetchFn,
+      }),
+    ).rejects.toThrow("ElevenLabs audio transcription response missing text");
+  });
+
+  it("throws when the provider response contains only blank text", async () => {
+    const { fetchFn } = createRequestCaptureJsonFetch({ text: "   " });
+
+    await expect(
+      transcribeElevenLabsAudio({
+        buffer: Buffer.from("audio-bytes"),
+        fileName: "voice.wav",
+        apiKey: "test-key",
+        timeoutMs: 1234,
+        fetchFn,
+      }),
+    ).rejects.toThrow("ElevenLabs audio transcription response missing text");
+  });
+});

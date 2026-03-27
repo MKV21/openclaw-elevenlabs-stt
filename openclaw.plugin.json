@@ -1,0 +1,14 @@
+{
+  "id": "elevenlabs-stt",
+  "providerAuthEnvVars": {
+    "elevenlabs": ["ELEVENLABS_API_KEY"]
+  },
+  "contracts": {
+    "mediaUnderstandingProviders": ["elevenlabs"]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
