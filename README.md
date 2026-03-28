@@ -4,13 +4,25 @@ Add ElevenLabs Speech-to-Text to OpenClaw's normal inbound audio pipeline (`tool
 
 The plugin is intentionally simple to use: install it, add an ElevenLabs provider block, and point an audio model entry at `provider: elevenlabs`. It also exposes selected ElevenLabs request options through `providerOptions.elevenlabs`, so you can tune transcript quality and behavior without leaving normal OpenClaw config.
 
-- Easy OpenClaw setup for normal inbound audio transcription
-- Supports useful ElevenLabs controls such as `no_verbatim`, `tag_audio_events`, diarization, and privacy-related settings
-- Install target: `@mkv21/elevenlabs-stt`
-- Plugin ID: `elevenlabs-stt`
-- Provider ID: `elevenlabs`
+## Table of contents
 
-## Quick Start
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Configuration](#configuration)
+- [Provider options](#provider-options)
+- [What this plugin covers](#what-this-plugin-covers)
+- [Compatibility](#compatibility)
+- [Development](#development)
+- [Documentation](#documentation)
+- [License](#license)
+
+## Prerequisites
+
+- OpenClaw `>=2026.3.24`
+- Node.js `>=22.14.0`
+- An [ElevenLabs API key](https://elevenlabs.io)
+
+## Quick start
 
 Install with OpenClaw:
 
@@ -60,9 +72,41 @@ Important notes:
 
 - If you want fallback behavior, add additional entries after the ElevenLabs model in `tools.media.audio.models`.
 
-## Common option example
+## Configuration
 
-You can tune the upstream ElevenLabs request through `providerOptions.elevenlabs`:
+| Field | Default | Description |
+|-------|---------|-------------|
+| `models.providers.elevenlabs.baseUrl` | `https://api.elevenlabs.io/v1` | Base URL for ElevenLabs API |
+| `models.providers.elevenlabs.apiKey` | — | Required. ElevenLabs API key |
+| `models.providers.elevenlabs.models` | — | Must be `[]` (required by OpenClaw's provider config shape) |
+| `tools.media.audio.models[].provider` | — | Must be `elevenlabs` for this plugin |
+| `tools.media.audio.models[].model` | `scribe_v2` | ElevenLabs STT model ID |
+| `tools.media.audio.language` | — | Global language hint passed as `language_code` |
+| `tools.media.audio.models[].language` | — | Per-entry language override |
+| `tools.media.audio.timeoutSeconds` | — | Global request timeout in seconds |
+| `tools.media.audio.models[].timeoutSeconds` | — | Per-entry request timeout override |
+
+## Provider options
+
+Tune the upstream ElevenLabs request through `providerOptions.elevenlabs`, set globally on `tools.media.audio.providerOptions.elevenlabs` or per model entry on `tools.media.audio.models[].providerOptions.elevenlabs`.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `tag_audio_events` | boolean | — | Include audio-event cues in transcript text |
+| `no_verbatim` | boolean | — | Cleaner transcript with fillers and false starts reduced (`scribe_v2`) |
+| `diarize` | boolean | — | Enable speaker diarization |
+| `num_speakers` | number | — | Expected number of speakers for diarization |
+| `diarization_threshold` | number | — | Diarization sensitivity threshold |
+| `use_multi_channel` | boolean | — | Treat input as separate speaker channels |
+| `timestamps_granularity` | string | — | Timestamp level: `word` or `character` |
+| `entity_detection` | string | — | Entity detection mode (e.g. `pii`) |
+| `redact` | boolean | — | Enable transcript redaction |
+| `entity_redaction` | string | — | Entity redaction behavior |
+| `temperature` | number | — | Transcription generation temperature |
+| `seed` | number | — | Transcription generation seed |
+| `file_format` | string | — | Override audio format detection |
+
+Example:
 
 ```yaml
 tools:
@@ -77,23 +121,31 @@ tools:
           model: scribe_v2
 ```
 
-Those options are useful when you want cleaner transcripts and explicit audio-event markers.
+> **Note:** OpenClaw currently consumes only the plain transcript text. Options whose main value is extra metadata (timestamps, speakers, channels, entities) are forwarded to ElevenLabs but not yet surfaced through OpenClaw's current audio result shape. Array-shaped options such as `keyterms` and `additional_formats` are not supported because current OpenClaw media `providerOptions` are scalar-only.
 
-## What This Plugin Covers
+## What this plugin covers
 
-- normal inbound audio transcription only
-- no telephony, realtime/streaming, or async webhook-based transcription flow
-- OpenClaw currently consumes only the plain transcript text, so extra metadata such as timestamps, speakers, channels, or entities is forwarded upstream but not surfaced in the current audio result shape
-- array- or object-shaped request options such as `keyterms` and `additional_formats` are not supported yet because current OpenClaw media `providerOptions` are scalar-only
+- Normal inbound audio transcription only
+- No telephony, realtime/streaming, or async webhook-based transcription flow
 
 ## Compatibility
 
 - Tested locally with OpenClaw `2026.3.24`
 - Requires OpenClaw host version `>=2026.3.24`
 
-## More Docs
+## Development
 
-- [Configuration Reference And Troubleshooting](./docs/configuration.md)
+```bash
+# Run tests
+npm test
+
+# Type check
+npm run typecheck
+```
+
+## Documentation
+
+- [Configuration Reference and Troubleshooting](./docs/configuration.md)
 
 ## AI-Assisted Development Disclaimer
 

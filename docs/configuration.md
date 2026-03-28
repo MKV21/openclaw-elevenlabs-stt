@@ -1,36 +1,18 @@
 # Configuration Reference
 
-This page collects the detailed configuration surface and troubleshooting notes for `@mkv21/elevenlabs-stt`.
-
-## Install Notes
+Extended configuration notes and troubleshooting for `@mkv21/elevenlabs-stt`.
+For the quick-reference tables, see the main [README](../README.md#configuration).
 
 - Install target: `@mkv21/elevenlabs-stt`
 - Plugin ID: `elevenlabs-stt`
 - Provider ID: `elevenlabs`
-- Use the scoped package for OpenClaw installs. On current OpenClaw versions, the unscoped name `elevenlabs-stt` collides with an existing ClawHub skill during resolver lookup.
 
-## Supported Base Configuration
+## Base configuration notes
 
-These are the main configuration fields supported by the plugin path today:
+- Use the scoped package name for OpenClaw installs. On current OpenClaw versions, the unscoped name `elevenlabs-stt` collides with an existing ClawHub skill during resolver lookup.
+- `models.providers.elevenlabs.models: []` is required by OpenClaw's shared provider config shape, even though this plugin does not use the models list.
 
-- `models.providers.elevenlabs.baseUrl`
-  Optional base URL override. Defaults to `https://api.elevenlabs.io/v1`.
-- `models.providers.elevenlabs.apiKey`
-  Required provider auth for real requests.
-- `tools.media.audio.models[].provider`
-  Must be `elevenlabs` for this plugin.
-- `tools.media.audio.models[].model`
-  Optional ElevenLabs STT model ID. Defaults to `scribe_v2`.
-- `tools.media.audio.language`
-  Optional global language hint passed as `language_code`.
-- `tools.media.audio.models[].language`
-  Optional per-entry language hint. This overrides the global `tools.media.audio.language` value for that model entry.
-- `tools.media.audio.timeoutSeconds`
-  Optional global request timeout.
-- `tools.media.audio.models[].timeoutSeconds`
-  Optional per-entry request timeout override.
-
-Example with a per-entry language override:
+Per-entry language overrides take precedence over the global `tools.media.audio.language`:
 
 ```yaml
 tools:
@@ -45,73 +27,39 @@ tools:
 
 In that example, the ElevenLabs request for that entry uses `language_code=de`.
 
-## Optional ElevenLabs STT Options
+## Provider option notes
 
-This plugin supports these ElevenLabs request options through `providerOptions.elevenlabs`.
+The [provider options table](../README.md#provider-options) lists all supported options. Below are detailed notes grouped by category.
 
-Most useful for normal transcripts:
+### Transcript quality
 
-- `tag_audio_events`
-- `no_verbatim`
+- `tag_audio_events` includes audio-event cues (e.g. laughter, music) in the returned transcript text.
+- `no_verbatim` asks ElevenLabs for a cleaner transcript with fillers and false starts reduced. Intended for `scribe_v2`.
 
-Privacy and entity handling:
+### Privacy and entity handling
 
-- `entity_detection`
-- `redact`
-- `entity_redaction`
-
-Speaker, channel, and timing controls:
-
-- `diarize`
-- `num_speakers`
-- `diarization_threshold`
-- `use_multi_channel`
-- `timestamps_granularity`
-
-Advanced tuning:
-
-- `temperature`
-- `seed`
-- `file_format`
-
-You can set them globally on `tools.media.audio.providerOptions.elevenlabs` or per model entry on `tools.media.audio.models[].providerOptions.elevenlabs`.
-
-Example:
-
-```yaml
-tools:
-  media:
-    audio:
-      providerOptions:
-        elevenlabs:
-          tag_audio_events: true
-          no_verbatim: true
-          diarize: true
-          timestamps_granularity: word
-          entity_detection: pii
-      models:
-        - provider: elevenlabs
-          model: scribe_v2
-```
-
-Notes:
-
-- `tag_audio_events` includes audio-event cues in the returned transcript text.
-- `no_verbatim` asks ElevenLabs for a cleaner transcript with fillers and false starts reduced.
-- `no_verbatim` is intended for `scribe_v2`.
 - `entity_detection`, `redact`, and `entity_redaction` control entity detection and transcript redaction behavior upstream.
+
+### Speaker, channel, and timing controls
+
 - `diarize`, `num_speakers`, and `diarization_threshold` control speaker diarization behavior upstream.
 - `use_multi_channel` tells ElevenLabs to treat input as separate speaker channels when the source audio actually has multiple channels.
 - `timestamps_granularity` forwards ElevenLabs' word- or character-level timestamp request setting.
+
+### Advanced tuning
+
 - `temperature` and `seed` forward transcription-generation controls to ElevenLabs.
 - `file_format` is only useful when you intentionally know the uploaded audio format details and want to override ElevenLabs' default handling.
+
+### Current limitations
+
 - OpenClaw currently consumes only the plain transcript text from the plugin result. Options whose main value is extra metadata such as timestamps, speakers, channels, or entities are forwarded to ElevenLabs, but that structured metadata is not yet surfaced back through OpenClaw's current audio result shape.
 - `keyterms` is not yet supported in this plugin because current OpenClaw media `providerOptions` only allow scalar values, not arrays.
 - `additional_formats`, `webhook`, and `cloud_storage_url` are intentionally not supported in this plugin path.
 
 ## Troubleshooting
 
-### Gateway Does Not Start After Enabling The Plugin
+### Gateway does not start after enabling the plugin
 
 This is usually caused by an incomplete `models.providers.elevenlabs` block.
 
@@ -131,7 +79,7 @@ models:
       models: []
 ```
 
-### The Plugin Is Installed, But Transcription Does Not Run
+### The plugin is installed, but transcription does not run
 
 Check all of the following:
 
@@ -140,7 +88,7 @@ Check all of the following:
 - `tools.media.audio.models` contains an ElevenLabs entry
 - `ELEVENLABS_API_KEY` is available to the Gateway process
 
-### I Want The API Key To Stay Out Of The Config File
+### I want the API key to stay out of the config file
 
 Use an env-backed secret ref for `models.providers.elevenlabs.apiKey`:
 
