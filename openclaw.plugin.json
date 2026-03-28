@@ -3,6 +3,8 @@
   "name": "ElevenLabs STT",
   "description": "ElevenLabs batch speech-to-text provider for OpenClaw media understanding",
   "providers": ["elevenlabs"],
+  "requiredEnvVars": ["ELEVENLABS_API_KEY"],
+  "primaryCredential": "ELEVENLABS_API_KEY",
   "providerAuthEnvVars": {
     "elevenlabs": ["ELEVENLABS_API_KEY"]
   },
