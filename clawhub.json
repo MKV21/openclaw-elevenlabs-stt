@@ -1,6 +1,6 @@
 {
   "name": "elevenlabs-stt",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "OpenClaw plugin for ElevenLabs speech-to-text on inbound audio",
   "installSpec": {
     "type": "npm",
