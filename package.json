@@ -1,6 +1,6 @@
 {
   "name": "@mkv21/elevenlabs-stt",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "OpenClaw plugin for ElevenLabs speech-to-text on inbound audio",
   "author": "Michael Faath",
   "license": "MIT",

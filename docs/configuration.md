@@ -38,7 +38,28 @@ The [provider options table](../README.md#provider-options) lists all supported 
 
 ### Privacy and entity handling
 
-- `entity_detection`, `redact`, and `entity_redaction` control entity detection and transcript redaction behavior upstream.
+- `entity_detection`, `redact`, `entity_redaction`, and `entity_redaction_mode` control entity detection and transcript redaction behavior upstream.
+- `entity_detection` alone does not change the returned transcript text; it only asks ElevenLabs to detect entities upstream.
+- To redact the transcript text itself, set `entity_redaction` to a matching subset of the detected entity groups/types and optionally choose `entity_redaction_mode` (`redacted`, `entity_type`, or `enumerated_entity_type`).
+- The current ElevenLabs API documents redaction primarily through `entity_redaction` and `entity_redaction_mode`. This plugin still forwards `redact` as a raw compatibility passthrough, but `entity_redaction` is the option to prefer.
+- Upstream accepts `entity_detection` and `entity_redaction` as either a single string or a list of strings. This plugin currently inherits OpenClaw's scalar-only media `providerOptions`, so configure one category or one specific entity label at a time.
+
+Supported high-level values currently documented by ElevenLabs:
+
+- `all`
+- categories: `pii`, `phi`, `pci`, `other`, `offensive_language`
+- common specific labels: `name`, `name_given`, `name_family`, `phone_number`, `email_address`, `dob`, `ssn`, `credit_card`, `bank_account`, `passport_number`, `location_address`, `ip_address`, `condition`, `drug`, `injury`, `organization`, `religion`, `political_affiliation`
+
+Common redaction modes:
+
+- `redacted` -> `{REDACTED}`
+- `entity_type` -> `{PHONE_NUMBER}`
+- `enumerated_entity_type` -> `{PHONE_NUMBER_1}`, `{PHONE_NUMBER_2}`, ...
+
+Official ElevenLabs references:
+
+- API reference: https://elevenlabs.io/docs/api-reference/speech-to-text/convert
+- Entity detection guide and full current entity-type list: https://elevenlabs.io/docs/eleven-api/guides/how-to/speech-to-text/batch/entity-detection
 
 ### Speaker, channel, and timing controls
 

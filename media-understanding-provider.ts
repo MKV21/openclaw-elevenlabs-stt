@@ -29,6 +29,7 @@ const ELEVENLABS_FORM_OPTIONS = new Set([
   "entity_detection",
   "redact",
   "entity_redaction",
+  "entity_redaction_mode",
   "temperature",
   "seed",
   "file_format",

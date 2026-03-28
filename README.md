@@ -103,9 +103,10 @@ Tune the upstream ElevenLabs request through `providerOptions.elevenlabs`, set g
 | `diarization_threshold` | number | — | Diarization sensitivity threshold |
 | `use_multi_channel` | boolean | — | Treat input as separate speaker channels |
 | `timestamps_granularity` | string | — | Timestamp level: `word` or `character` |
-| `entity_detection` | string | — | Entity detection mode (e.g. `pii`) |
-| `redact` | boolean | — | Enable transcript redaction |
-| `entity_redaction` | string | — | Entity redaction behavior |
+| `entity_detection` | string | — | Entity category/type to detect (e.g. `pii`, `name`, `phone_number`) |
+| `redact` | boolean | — | Legacy upstream passthrough; prefer `entity_redaction` with current ElevenLabs API |
+| `entity_redaction` | string | — | Entity groups/types to redact from transcript text |
+| `entity_redaction_mode` | string | — | Redaction style: `redacted`, `entity_type`, or `enumerated_entity_type` |
 | `temperature` | number | — | Transcription generation temperature |
 | `seed` | number | — | Transcription generation seed |
 | `file_format` | string | — | Override audio format detection |
@@ -126,6 +127,10 @@ tools:
 ```
 
 > **Note:** OpenClaw currently consumes only the plain transcript text. Options whose main value is extra metadata (timestamps, speakers, channels, entities) are forwarded to ElevenLabs but not yet surfaced through OpenClaw's current audio result shape. Array-shaped options such as `keyterms` and `additional_formats` are not supported because current OpenClaw media `providerOptions` are scalar-only.
+
+> **Privacy note:** `entity_detection` alone only asks ElevenLabs to detect entities upstream. If you want the transcript text itself redacted, also set `entity_redaction` to a matching subset and optionally `entity_redaction_mode` to control how replacements are rendered.
+
+> **Entity values:** ElevenLabs currently accepts `all`, category values such as `pii`, `phi`, `pci`, `other`, and `offensive_language`, or specific entity labels such as `name`, `phone_number`, `email_address`, `dob`, `ssn`, `credit_card`, `condition`, and `organization`. Upstream also accepts lists, but this plugin currently inherits OpenClaw's scalar-only `providerOptions`, so use one category or one specific label per option for now. See the official [Speech-to-Text API reference](https://elevenlabs.io/docs/api-reference/speech-to-text/convert) and [Entity detection guide](https://elevenlabs.io/docs/eleven-api/guides/how-to/speech-to-text/batch/entity-detection).
 
 ## What this plugin covers
 

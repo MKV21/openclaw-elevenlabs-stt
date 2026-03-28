@@ -131,7 +131,8 @@ describe("transcribeElevenLabsAudio", () => {
         timestamps_granularity: "word",
         entity_detection: "pii",
         redact: "pii",
-        entity_redaction: "entity_type",
+        entity_redaction: "pii",
+        entity_redaction_mode: "entity_type",
         temperature: 0,
         seed: 42,
         file_format: "other",
@@ -154,7 +155,8 @@ describe("transcribeElevenLabsAudio", () => {
     expect(form.get("timestamps_granularity")).toBe("word");
     expect(form.get("entity_detection")).toBe("pii");
     expect(form.get("redact")).toBe("pii");
-    expect(form.get("entity_redaction")).toBe("entity_type");
+    expect(form.get("entity_redaction")).toBe("pii");
+    expect(form.get("entity_redaction_mode")).toBe("entity_type");
     expect(form.get("temperature")).toBe("0");
     expect(form.get("seed")).toBe("42");
     expect(form.get("file_format")).toBe("other");
