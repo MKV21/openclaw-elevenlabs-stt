@@ -2,9 +2,25 @@
   "id": "elevenlabs-stt",
   "name": "ElevenLabs STT",
   "description": "ElevenLabs batch speech-to-text provider for OpenClaw media understanding",
+  "providers": ["elevenlabs"],
   "providerAuthEnvVars": {
     "elevenlabs": ["ELEVENLABS_API_KEY"]
   },
+  "providerAuthChoices": [
+    {
+      "provider": "elevenlabs",
+      "method": "api-key",
+      "choiceId": "elevenlabs-api-key",
+      "choiceLabel": "ElevenLabs API key",
+      "choiceHint": "Required for ElevenLabs speech-to-text requests",
+      "groupId": "elevenlabs",
+      "groupLabel": "ElevenLabs",
+      "optionKey": "elevenlabsApiKey",
+      "cliFlag": "--elevenlabs-api-key",
+      "cliOption": "--elevenlabs-api-key <key>",
+      "cliDescription": "ElevenLabs API key"
+    }
+  ],
   "contracts": {
     "mediaUnderstandingProviders": ["elevenlabs"]
   },

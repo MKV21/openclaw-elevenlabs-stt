@@ -4,7 +4,7 @@ This page collects the detailed configuration surface and troubleshooting notes 
 
 ## Install Notes
 
-- Published package name: `@mkv21/elevenlabs-stt`
+- Install target: `@mkv21/elevenlabs-stt`
 - Plugin ID: `elevenlabs-stt`
 - Provider ID: `elevenlabs`
 - Use the scoped package for OpenClaw installs. On current OpenClaw versions, the unscoped name `elevenlabs-stt` collides with an existing ClawHub skill during resolver lookup.

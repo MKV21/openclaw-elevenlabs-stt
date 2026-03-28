@@ -6,13 +6,13 @@ The plugin is intentionally simple to use: install it, add an ElevenLabs provide
 
 - Easy OpenClaw setup for normal inbound audio transcription
 - Supports useful ElevenLabs controls such as `no_verbatim`, `tag_audio_events`, diarization, and privacy-related settings
-- Published package: `@mkv21/elevenlabs-stt`
+- Install target: `@mkv21/elevenlabs-stt`
 - Plugin ID: `elevenlabs-stt`
 - Provider ID: `elevenlabs`
 
 ## Quick Start
 
-Install from npm:
+Install with OpenClaw:
 
 ```bash
 openclaw plugins install @mkv21/elevenlabs-stt
