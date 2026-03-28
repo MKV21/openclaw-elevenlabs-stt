@@ -72,13 +72,12 @@ tools:
         elevenlabs:
           no_verbatim: true
           tag_audio_events: true
-          enable_logging: false
       models:
         - provider: elevenlabs
           model: scribe_v2
 ```
 
-Those options are useful when you want cleaner transcripts, explicit audio-event markers, or lower-retention processing behavior on the ElevenLabs side.
+Those options are useful when you want cleaner transcripts and explicit audio-event markers.
 
 ## What This Plugin Covers
 

@@ -33,7 +33,6 @@ const ELEVENLABS_FORM_OPTIONS = new Set([
   "seed",
   "file_format",
 ]);
-const ELEVENLABS_QUERY_OPTIONS = new Set(["enable_logging"]);
 
 function resolveModel(model: string | undefined, fallback: string): string {
   const trimmed = model?.trim();
@@ -84,31 +83,12 @@ function appendSupportedFormOptions(
   }
 }
 
-function buildTranscriptionUrl(
-  baseUrl: string,
-  query: AudioTranscriptionRequest["query"] | undefined,
-): string {
-  const url = new URL(`${baseUrl}/speech-to-text`);
-  if (query) {
-    for (const [key, rawValue] of Object.entries(query)) {
-      if (!ELEVENLABS_QUERY_OPTIONS.has(key)) {
-        continue;
-      }
-      const value = serializeOptionValue(rawValue);
-      if (value !== undefined) {
-        url.searchParams.set(key, value);
-      }
-    }
-  }
-  return url.toString();
-}
-
 export async function transcribeElevenLabsAudio(
   params: AudioTranscriptionRequest,
 ): Promise<AudioTranscriptionResult> {
   const fetchFn = params.fetchFn ?? fetch;
   const baseUrl = normalizeBaseUrl(params.baseUrl, ELEVENLABS_DEFAULT_AUDIO_BASE_URL);
-  const url = buildTranscriptionUrl(baseUrl, params.query);
+  const url = `${baseUrl}/speech-to-text`;
   const model = resolveModel(params.model, ELEVENLABS_DEFAULT_AUDIO_TRANSCRIPTION_MODEL);
 
   const form = new FormData();

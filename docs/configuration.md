@@ -53,7 +53,6 @@ Most useful for normal transcripts:
 
 - `tag_audio_events`
 - `no_verbatim`
-- `enable_logging`
 
 Privacy and entity handling:
 
@@ -87,7 +86,6 @@ tools:
         elevenlabs:
           tag_audio_events: true
           no_verbatim: true
-          enable_logging: false
           diarize: true
           timestamps_granularity: word
           entity_detection: pii
@@ -100,7 +98,6 @@ Notes:
 
 - `tag_audio_events` includes audio-event cues in the returned transcript text.
 - `no_verbatim` asks ElevenLabs for a cleaner transcript with fillers and false starts reduced.
-- `enable_logging: false` is useful when you want lower-retention processing behavior on the provider side.
 - `no_verbatim` is intended for `scribe_v2`.
 - `entity_detection`, `redact`, and `entity_redaction` control entity detection and transcript redaction behavior upstream.
 - `diarize`, `num_speakers`, and `diarization_threshold` control speaker diarization behavior upstream.

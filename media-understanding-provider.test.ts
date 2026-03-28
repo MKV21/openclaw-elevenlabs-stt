@@ -110,7 +110,7 @@ describe("transcribeElevenLabsAudio", () => {
     expect(form.get("language_code")).toBe("en");
   });
 
-  it("passes supported scalar ElevenLabs options from providerOptions", async () => {
+  it("passes supported scalar ElevenLabs form options from providerOptions", async () => {
     const { fetchFn, getRequest } = createRequestCaptureJsonFetch({
       text: "Hello world",
     });
@@ -124,7 +124,6 @@ describe("transcribeElevenLabsAudio", () => {
       query: {
         tag_audio_events: true,
         no_verbatim: false,
-        enable_logging: false,
         diarize: true,
         num_speakers: 2,
         diarization_threshold: 0.22,
@@ -143,7 +142,7 @@ describe("transcribeElevenLabsAudio", () => {
     });
 
     const { url, init } = getRequest();
-    expect(url).toBe("https://api.elevenlabs.io/v1/speech-to-text?enable_logging=false");
+    expect(url).toBe("https://api.elevenlabs.io/v1/speech-to-text");
 
     const form = init?.body as FormData;
     expect(form.get("tag_audio_events")).toBe("true");
