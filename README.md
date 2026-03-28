@@ -32,6 +32,10 @@ openclaw plugins install @mkv21/elevenlabs-stt
 
 Use the scoped package name for OpenClaw installs. On current OpenClaw versions, the unscoped name `elevenlabs-stt` collides with an existing ClawHub skill during resolver lookup.
 
+> **Warning**
+> Before restarting the OpenClaw Gateway after installation, add the full `models.providers.elevenlabs` config block shown below.
+> If the plugin is enabled but the provider block is missing or incomplete, OpenClaw can fail validation during startup and the Gateway may no longer start.
+
 Minimal working config:
 
 ```yaml
